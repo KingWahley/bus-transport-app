@@ -40,12 +40,7 @@ export default function PopularRoutes() {
     },
   };
 
-  const handleViewAllClick = (e) => {
-    if (window.innerWidth < 640) {
-      e.preventDefault();
-      setIsMobileExpanded(!isMobileExpanded);
-    }
-  };
+
 
   return (
     <motion.section
@@ -71,13 +66,23 @@ export default function PopularRoutes() {
             </p>
           </div>
 
-          <Link
-            href="/booking"
-            onClick={handleViewAllClick}
-            className="text-sm font-bold text-emerald-600 hover:text-emerald-500 transition"
-          >
-            {isMobileExpanded ? "Show less" : "View all destinations →"}
-          </Link>
+          <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+            {/* Mobile: Toggle Button */}
+            <button
+              onClick={() => setIsMobileExpanded(!isMobileExpanded)}
+              className="text-sm font-bold text-emerald-600 hover:text-emerald-500 transition sm:hidden"
+            >
+              {isMobileExpanded ? "Show less" : "View all destinations →"}
+            </button>
+
+            {/* Desktop: Navigation Link */}
+            <Link
+              href="/booking"
+              className="hidden text-sm font-bold text-emerald-600 hover:text-emerald-500 transition sm:block"
+            >
+              View all destinations →
+            </Link>
+          </div>
         </motion.div>
 
         {/* Desktop Grid */}

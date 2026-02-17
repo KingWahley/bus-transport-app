@@ -1249,6 +1249,13 @@ video {
 .border-white\/20 {
   border-color: rgb(255 255 255 / 0.2);
 }
+.\!bg-white {
+  --tw-bg-opacity: 1 !important;
+  background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1)) !important;
+}
+.\!bg-white\/30 {
+  background-color: rgb(255 255 255 / 0.3) !important;
+}
 .bg-\[\#F2F2F2\] {
   --tw-bg-opacity: 1;
   background-color: rgb(242 242 242 / var(--tw-bg-opacity, 1));
@@ -1327,22 +1334,6 @@ video {
 }
 .bg-white\/95 {
   background-color: rgb(255 255 255 / 0.95);
-}
-.\!bg-white {
-  --tw-bg-opacity: 1 !important;
-  background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1)) !important;
-}
-.\!bg-white\/80 {
-  background-color: rgb(255 255 255 / 0.8) !important;
-}
-.\!bg-white\/0 {
-  background-color: rgb(255 255 255 / 0) !important;
-}
-.\!bg-white\/50 {
-  background-color: rgb(255 255 255 / 0.5) !important;
-}
-.\!bg-white\/30 {
-  background-color: rgb(255 255 255 / 0.3) !important;
 }
 .bg-\[radial-gradient\(circle_at_top\2c _rgba\(255\2c 255\2c 255\2c 0\.4\)\2c _transparent_70\%\)\] {
   background-image: radial-gradient(circle at top, rgba(255,255,255,0.4), transparent 70%);
@@ -2031,6 +2022,14 @@ h6 {
 
   .sm\:grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .sm\:flex-row {
+    flex-direction: row;
+  }
+
+  .sm\:items-center {
+    align-items: center;
   }
 
   .sm\:p-10 {
