@@ -95,8 +95,8 @@ export default function Navbar() {
           }
           headerClassName={`!fixed !top-6 !left-6 !right-6 !w-auto !p-2 rounded-full border border-slate-200 transition-all duration-300 z-[60] ${
             isScrolled 
-              ? "bg-white/80 shadow-2xl shadow-slate-200/50 backdrop-blur-xl" 
-              : "bg-white shadow-sm"
+              ? "!bg-white/30 shadow-2xl shadow-slate-200/50 backdrop-blur-xl" 
+              : "!bg-white shadow-sm"
           }`}
         />
       </div>
