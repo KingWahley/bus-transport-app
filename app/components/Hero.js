@@ -90,7 +90,7 @@ export default function Hero() {
               animateBy="words"
               direction="top"
               onAnimationComplete={handleAnimationComplete}
-             className="mx-auto mt-6 max-w-2xl text-lg text-slate-200 drop-shadow-md"
+             className="mx-auto mt-6 max-w-2xl text-lg text-slate-200 drop-shadow-md text-center justify-center"
             />
             </div>
 

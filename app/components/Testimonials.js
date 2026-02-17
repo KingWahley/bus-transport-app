@@ -63,12 +63,12 @@ export default function Testimonials() {
             Don't take our word for it!
           </h2>
           <SplitText
+            splitType="words"
             text="Hear it from our passengers."
-            className=" font-heading text-5xl  font-bold text-slate-900 max-w-2xl leading-tight"
+            className=" font-heading text-4xl md:text-5xl  font-bold text-slate-900 max-w-2xl leading-tight"
             delay={50}
             duration={1.25}
             ease="power3.out"
-            splitType="chars"
             from={{ opacity: 0, y: 40 }}
             to={{ opacity: 1, y: 0 }}
             threshold={0.1}
