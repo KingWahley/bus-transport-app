@@ -1,231 +1,345 @@
-'use client';
-
+"use client"
 import { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-import { Bus, Wifi, Wind, Armchair, CheckCircle2, Ticket } from "lucide-react";
-
-const baseFare = 5000;
+import { Filter, ChevronLeft, ArrowRight, User } from "lucide-react";
+import BusCard from "./components/BusCard";
+import SeatMap from "./components/SeatMap";
+import BookingSearch from "./components/BookingSearch";
+import PassengerFormModal from "./components/PassengerFormModal";
+import { useSearchParams, useRouter } from 'next/navigation';
 
 export default function Booking() {
-  const [busType, setBusType] = useState("Standard");
-  const [features, setFeatures] = useState([]);
-  const [seat, setSeat] = useState(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  
+  const fromParam = searchParams.get('from');
+  const toParam = searchParams.get('to');
+  const dateParam = searchParams.get('date');
+  
+  // If params exist, start at 'bus', otherwise 'search'
+  const [step, setStep] = useState(fromParam ? "bus" : "search"); // 'search' | 'bus' | 'seat'
+  
+  const [selectedBus, setSelectedBus] = useState(null);
+  const [selectedSeats, setSelectedSeats] = useState([]);
+  
+  // Use state for search values to allow updates
+  const [searchDetails, setSearchDetails] = useState({
+      from: fromParam || 'Lagos',
+      to: toParam || 'Abuja',
+      date: dateParam || new Date().toISOString().split('T')[0]
+  });
+  
+  // Helper to get display values
+  const { from, to, date } = searchDetails;
+
+  const handleSearch = (details) => {
+      setSearchDetails(details);
+      setStep('bus');
+      // Optionally update URL without reload
+      const params = new URLSearchParams();
+      params.set('from', details.from);
+      params.set('to', details.to);
+      params.set('date', details.date);
+      router.push(`/booking?${params.toString()}`, { scroll: false });
+  };
+
+  // Mock Data
+  const buses = [
+    {
+      id: 1,
+      operator: "Emerald Express",
+      type: "Luxury",
+      from: from,
+      to: to,
+      departureTime: "07:00 AM",
+      arrivalTime: "04:30 PM",
+      duration: "9h 30m",
+      price: 15500,
+      rating: 4.8,
+      amenities: ["AC", "Wifi", "Power"],
+      seatsAvailable: 24
+    },
+    {
+      id: 2,
+      operator: "Orix Transport",
+      type: "Standard",
+      from: from,
+      to: to,
+      departureTime: "08:15 AM",
+      arrivalTime: "06:00 PM",
+      duration: "9h 45m",
+      price: 12000,
+      rating: 4.5,
+      amenities: ["AC"],
+      seatsAvailable: 12
+    },
+    {
+       id: 3,
+       operator: "Emerald Executive",
+       type: "VIP",
+       from: from,
+       to: to,
+       departureTime: "09:00 AM",
+       arrivalTime: "05:30 PM",
+       duration: "8h 30m",
+       price: 22000,
+       rating: 5.0,
+       amenities: ["AC", "Wifi", "Power", "Meal"],
+       seatsAvailable: 8
+    }
+  ];
+
+  const handleBusSelect = (bus) => {
+    setSelectedBus(bus);
+    setSelectedSeats([]); // Reset seats when bus changes
+    
+    // On mobile, changing bus might automatically go to next step
+    if (window.innerWidth < 1024) {
+        setStep("seat");
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleBack = () => {
+      if (step === 'seat') {
+          setStep('bus');
+      } else {
+          router.back();
+      }
+  };
+  
+  const [passengerDetails, setPassengerDetails] = useState({
+    fullName: '',
+    phone: ''
+  });
   const [ticket, setTicket] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const featurePrices = {
-    "AC": { price: 1000, icon: Wind },
-    "Wifi": { price: 500, icon: Wifi },
-    "Extra Legroom": { price: 1500, icon: Armchair },
+  // Single seat selection: simplified logic
+  const toggleSeat = (seatId) => {
+    if (selectedSeats.includes(seatId)) {
+        setSelectedSeats([]);
+    } else {
+        setSelectedSeats([seatId]);
+    }
   };
 
-  const busTypeMultiplier = {
-    Standard: 1,
-    Luxury: 1.5,
-    VIP: 2,
-  };
-
-  const totalFare = () => {
-    let base = baseFare * busTypeMultiplier[busType];
-    let addons = features.reduce((acc, f) => acc + featurePrices[f].price, 0);
-    return base + addons;
-  };
-
-  const toggleFeature = (feature) => {
-    setFeatures((prev) =>
-      prev.includes(feature)
-        ? prev.filter((f) => f !== feature)
-        : [...prev, feature]
-    );
-  };
-
-  const generateTicket = () => {
-    if (!seat) return alert("Please select a seat");
-    const ticketNumber = uuidv4().slice(0, 8).toUpperCase();
-    setTicket({
-      number: ticketNumber,
-      seat,
-      fare: totalFare().toLocaleString(),
-      type: busType,
-      features: features.join(", "),
-    });
+  const handleModalSubmit = (details) => {
+      setPassengerDetails(details);
+      
+      // Generate Ticket
+      setTicket({
+          id: Math.random().toString(36).substr(2, 9).toUpperCase(),
+          bus: selectedBus,
+          seats: selectedSeats,
+          passenger: details,
+          date: new Date().toISOString()
+      });
+      setIsModalOpen(false);
   };
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-6 pt-24 pb-40 lg:px-12">
-      <div className="mb-12 text-center">
-        <h1 className="font-heading text-4xl font-bold text-slate-900 sm:text-5xl">
-          Configure Your Journey
-        </h1>
-        <p className="mt-4 text-slate-600">
-          Customize your travel experience with premium add-ons and seat selection.
-        </p>
-      </div>
-
-      <div className="grid gap-8 lg:grid-cols-[1fr_400px]">
-        <div className="space-y-8">
-          {/* Bus Type Selection */}
-          <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-            <h2 className="mb-6 flex items-center gap-3 text-xl font-bold text-slate-900">
-              <Bus className="text-emerald-500" /> Choose Class
-            </h2>
-            <div className="grid gap-4 sm:grid-cols-3">
-              {Object.keys(busTypeMultiplier).map((type) => (
-                <button
-                  key={type}
-                  onClick={() => setBusType(type)}
-                  className={`relative overflow-hidden rounded-2xl border p-6 text-left transition-all ${
-                    busType === type
-                      ? "border-emerald-500 bg-emerald-50 shadow-lg shadow-emerald-500/10"
-                      : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100"
-                  }`}
+    <div className="min-h-screen pt-24 pb-12 bg-slate-50">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        
+        {/* Header / Breadcrumb */}
+        <div className="mb-8 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            {step !== 'search' && (
+                <button 
+                    onClick={handleBack}
+                    className="rounded-full bg-white p-2 text-slate-500 shadow-sm transition-colors hover:bg-slate-100 hover:text-slate-900"
                 >
-                  <p className={`font-bold ${busType === type ? "text-emerald-600" : "text-slate-900"}`}>
-                    {type}
-                  </p>
-                  <p className="mt-1 text-xs text-slate-500">
-                    {type === "Standard" ? "Basic comfort" : type === "Luxury" ? "Enhanced legroom" : "Full reclining seats"}
-                  </p>
-                  {busType === type && (
-                    <div className="absolute right-4 top-4 text-emerald-500">
-                      <CheckCircle2 className="h-5 w-5" />
-                    </div>
-                  )}
+                    <ChevronLeft className="h-5 w-5" />
                 </button>
-              ))}
+            )}
+            <div>
+                 <h1 className="text-xl font-bold text-slate-900 sm:text-2xl">
+                    {step === 'search' ? 'Plan Your Trip' : step === 'bus' ? 'Select Bus' : 'Choose Seats'}
+                 </h1>
+                 {step !== 'search' && (
+                    <p className="text-sm text-slate-500">
+                        {from} <span className="mx-1 text-emerald-500">→</span> {to} • {new Date(date).toDateString()}
+                    </p>
+                 )}
             </div>
-          </section>
-
-          {/* Add-ons */}
-          <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-             <h2 className="mb-6 flex items-center gap-3 text-xl font-bold text-slate-900">
-              <div className="grid h-6 w-6 place-items-center rounded-full bg-emerald-500/20 text-emerald-500">
-                <span className="text-xs font-bold">+</span>
-              </div>
-              Add-on Features
-            </h2>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {Object.entries(featurePrices).map(([name, { price, icon: Icon }]) => (
-                <button
-                  key={name}
-                  onClick={() => toggleFeature(name)}
-                  className={`flex items-center justify-between rounded-xl border p-4 transition-all ${
-                    features.includes(name)
-                      ? "border-emerald-500 bg-emerald-50"
-                      : "border-slate-200 bg-slate-50 hover:bg-slate-100"
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`rounded-lg p-2 ${features.includes(name) ? "bg-emerald-500 text-white" : "bg-slate-200 text-slate-500"}`}>
-                      <Icon className="h-4 w-4" />
-                    </div>
-                    <div className="text-left">
-                      <p className="font-bold text-slate-900">{name}</p>
-                      <p className="text-xs text-slate-500">+₦{price}</p>
-                    </div>
-                  </div>
-                  <div className={`h-5 w-5 rounded-full border-2 ${features.includes(name) ? "border-emerald-500 bg-emerald-500" : "border-slate-300"}`}></div>
-                </button>
-              ))}
-            </div>
-          </section>
-
-          {/* Seat Selection */}
-          <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-            <h2 className="mb-6 flex items-center gap-3 text-xl font-bold text-slate-900">
-              <Armchair className="text-emerald-500" /> Select Seat
-            </h2>
-            <div className="mx-auto grid max-w-sm grid-cols-4 gap-3">
-              {Array.from({ length: 24 }, (_, i) => i + 1).map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setSeat(s)}
-                  className={`group relative flex aspect-square flex-col items-center justify-center rounded-xl border transition-all ${
-                    seat === s
-                      ? "border-emerald-500 bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
-                      : "border-slate-200 bg-slate-100 text-slate-400 hover:border-slate-300 hover:bg-slate-200"
-                  }`}
-                >
-                  <span className="text-sm font-bold">{s}</span>
-                </button>
-              ))}
-            </div>
-            <div className="mt-6 flex justify-center gap-6 text-xs text-slate-500">
-               <div className="flex items-center gap-2"><div className="h-3 w-3 rounded-full bg-slate-200 border border-slate-300"></div> Available</div>
-               <div className="flex items-center gap-2"><div className="h-3 w-3 rounded-full bg-emerald-500"></div> Selected</div>
-            </div>
-          </section>
+          </div>
+          
+          <div className="hidden sm:flex items-center gap-2">
+             <div className={`h-2 w-2 rounded-full ${step === 'search' ? 'bg-emerald-500' : 'bg-emerald-200'}`}></div>
+             <div className="h-[2px] w-8 bg-slate-200"></div>
+             <div className={`h-2 w-2 rounded-full ${step === 'bus' ? 'bg-emerald-500' : step === 'search' ? 'bg-slate-300' : 'bg-emerald-200'}`}></div>
+             <div className="h-[2px] w-8 bg-slate-200"></div>
+             <div className={`h-2 w-2 rounded-full ${step === 'seat' ? 'bg-emerald-500' : 'bg-slate-300'}`}></div>
+          </div>
         </div>
 
-        {/* Summary Side Panel */}
-        <div className="fixed bottom-0 left-0 right-0 z-50 h-auto max-h-[60vh] overflow-y-auto border-t border-slate-200 bg-white/90 p-4 backdrop-blur-xl lg:sticky lg:top-32 lg:bottom-auto lg:h-fit lg:border-none lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
-          {!ticket ? (
-            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/50">
-              <h3 className="mb-6 text-lg font-bold text-slate-900">Trip Summary</h3>
-              <div className="space-y-4">
-                <div className="flex justify-between text-sm text-slate-500">
-                  <span>Base Fare ({busType})</span>
-                  <span className="text-slate-900">₦{(baseFare * busTypeMultiplier[busType]).toLocaleString()}</span>
-                </div>
-                {features.map(f => (
-                  <div key={f} className="flex justify-between text-sm text-slate-500">
-                      <span>{f}</span>
-                      <span className="text-slate-900">₦{featurePrices[f].price}</span>
-                  </div>
-                ))}
-                <div className="border-t border-slate-100 pt-4">
-                  <div className="flex justify-between items-end">
-                      <span className="text-sm text-slate-500">Total</span>
-                      <span className="text-2xl font-bold text-slate-900">₦{totalFare().toLocaleString()}</span>
-                  </div>
-                </div>
-              </div>
-              
-              <button
-                onClick={generateTicket}
-                className="mt-8 w-full rounded-full bg-emerald-600 py-4 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-500 hover:shadow-emerald-600/30"
-              >
-                Confirm & Pay
-              </button>
+        {/* Search Step */}
+        {step === 'search' && (
+            <div className="mx-auto max-w-lg lg:max-w-2xl">
+                <BookingSearch 
+                    initialValues={{ from, to, date }}
+                    onSearch={handleSearch}
+                />
             </div>
-          ) : (
-            <div className="overflow-hidden rounded-3xl bg-white text-slate-900 border border-slate-200 shadow-xl shadow-slate-200/50">
-              <div className="bg-emerald-500 p-4 text-center">
-                <p className="font-bold text-white">Booking Confirmed</p>
-              </div>
-              <div className="p-6 space-y-4">
-                <div className="flex justify-between">
-                    <div>
-                        <p className="text-xs text-slate-500 uppercase">Ticket No</p>
-                        <p className="font-mono font-bold text-xl">{ticket.number}</p>
+        )}
+
+        
+        {step !== 'search' && (
+            <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
+            
+                {/* Left Panel: Bus List */}
+                <div className={`
+                        flex-1 space-y-4 transition-all duration-300
+                        ${step === 'seat' ? 'hidden lg:block lg:w-1/3 lg:opacity-50 lg:pointer-events-none' : 'w-full'}
+                `}>
+                    <div className="mb-4 flex items-center justify-between">
+                        <span className="font-bold text-slate-900">{buses.length} Buses Found</span>
+                        <div className="flex gap-4">
+                            <button 
+                                onClick={() => setStep('search')}
+                                className="text-sm font-medium text-slate-500 hover:text-emerald-600"
+                            >
+                                Edit Search
+                            </button>
+                            <button className="flex items-center gap-2 text-sm font-medium text-emerald-600 hover:text-emerald-700">
+                                <Filter className="h-4 w-4" /> Filter
+                            </button>
+                        </div>
                     </div>
-                    <div className="text-right">
-                        <p className="text-xs text-slate-500 uppercase">Seat</p>
-                        <p className="font-bold text-xl">{ticket.seat}</p>
-                    </div>
+                    
+                    {buses.map((bus) => (
+                        <BusCard 
+                            key={bus.id} 
+                            bus={bus} 
+                            selected={selectedBus?.id === bus.id}
+                            onSelect={handleBusSelect}
+                        />
+                    ))}
                 </div>
-                <div>
-                     <p className="text-xs text-slate-500 uppercase">Class</p>
-                     <p className="font-bold">{ticket.type}</p>
+
+                {/* Right Panel: Seats & Checkout */}
+                <div className={`
+                        w-full lg:w-[400px] xl:w-[450px]
+                        ${step === 'bus' ? 'hidden lg:block' : 'block'}
+                `}>
+                    {selectedBus ? (
+                        <div className="sticky top-28 space-y-6">
+                            {!ticket ? (
+                                <>
+                                    <SeatMap 
+                                        selectedSeats={selectedSeats}
+                                        onSeatToggle={toggleSeat}
+                                        price={selectedBus.price}
+                                    />
+                                    
+                            {selectedSeats.length > 0 && (
+                                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/50">
+                                    <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-4">
+                                        <span className="text-sm font-bold text-slate-500">Summary</span>
+                                        <User className="h-4 w-4 text-slate-400" />
+                                    </div>
+                                    
+                                    <div className="mb-6 flex items-center justify-between">
+                                         <span className="text-slate-500">Selected Seat</span>
+                                         <span className="font-bold text-emerald-600 text-lg">{selectedSeats[0]}</span>
+                                    </div>
+                                    
+                                    <button 
+                                        onClick={() => setIsModalOpen(true)}
+                                        className="w-full rounded-xl bg-emerald-600 py-4 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-500 hover:shadow-emerald-600/30 active:scale-95"
+                                    >
+                                        Proceed to Payment
+                                    </button>
+                                </div>
+                            )}
+                                </>
+                            ) : (
+                                <div className="overflow-hidden rounded-3xl bg-white text-slate-900 border border-slate-200 shadow-xl shadow-slate-200/50">
+                                    <div className="bg-emerald-500 p-6 text-center text-white">
+                                        <div className="mb-2 flex justify-center">
+                                            <div className="rounded-full bg-white/20 p-3">
+                                                <User className="h-6 w-6 text-white" />
+                                            </div>
+                                        </div>
+                                        <h3 className="text-xl font-bold">Booking Confirmed!</h3>
+                                        <p className="text-emerald-100 text-sm">Your ticket has been generated</p>
+                                    </div>
+                                    
+                                    <div className="p-6 space-y-6">
+                                        {/* Passenger Info */}
+                                        <div className="flex justify-between border-b border-slate-100 pb-4">
+                                             <div>
+                                                 <p className="text-xs font-bold uppercase text-slate-400">Passenger</p>
+                                                 <p className="font-bold text-slate-900">{ticket.passenger.fullName}</p>
+                                                 <p className="text-xs text-slate-500">{ticket.passenger.phone}</p>
+                                             </div>
+                                             <div className="text-right">
+                                                 <p className="text-xs font-bold uppercase text-slate-400">Seat No</p>
+                                                 <p className="text-2xl font-bold text-emerald-600">{ticket.seats[0]}</p>
+                                             </div>
+                                        </div>
+
+                                        {/* Trip Info */}
+                                        <div className="space-y-2">
+                                            <div className="flex justify-between">
+                                                <span className="text-sm text-slate-500">Route</span>
+                                                <span className="font-bold text-slate-900">{ticket.bus.from} → {ticket.bus.to}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-sm text-slate-500">Date</span>
+                                                <span className="font-bold text-slate-900">{new Date(ticket.date).toDateString()}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-sm text-slate-500">Time</span>
+                                                <span className="font-bold text-slate-900">{ticket.bus.departureTime}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-sm text-slate-500">Bus Operator</span>
+                                                <span className="font-bold text-slate-900">{ticket.bus.operator}</span>
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Ticket ID */}
+                                        <div className="rounded-xl bg-slate-50 p-4 text-center border border-dashed border-slate-200">
+                                            <p className="text-xs font-bold uppercase text-slate-400">Ticket ID</p>
+                                            <p className="font-mono text-lg font-bold text-slate-900 tracking-wider">{ticket.id}</p>
+                                        </div>
+
+                                        <button 
+                                            onClick={() => window.print()}
+                                            className="w-full rounded-xl bg-slate-900 py-3 text-sm font-bold text-white transition hover:bg-slate-800"
+                                        >
+                                            Download Ticket
+                                        </button>
+                                        
+                                        <button 
+                                            onClick={() => { setTicket(null); setSelectedBus(null); setStep('search'); }}
+                                            className="w-full text-center text-xs font-bold text-slate-500 hover:text-emerald-600"
+                                        >
+                                            Book Another Trip
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="hidden h-[400px] flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-slate-50 text-center lg:flex">
+                            <div className="mb-4 rounded-full bg-slate-100 p-4">
+                                <ArrowRight className="h-6 w-6 text-slate-400" />
+                            </div>
+                            <p className="font-medium text-slate-500">Select a bus to view seats</p>
+                        </div>
+                    )}
                 </div>
-                {ticket.features && (
-                    <div>
-                        <p className="text-xs text-slate-500 uppercase">Add-ons</p>
-                        <p className="text-sm font-medium">{ticket.features}</p>
-                    </div>
-                )}
-                <div className="border-t border-dashed border-slate-300 pt-4 mt-4">
-                     <p className="text-xs text-slate-500 uppercase">Total Paid</p>
-                     <p className="font-bold text-2xl text-emerald-600">₦{ticket.fare}</p>
-                </div>
-              </div>
-              <div className="p-4 bg-slate-50 flex justify-center">
-                  <button onClick={() => window.print()} className="flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900">
-                      <Ticket className="h-4 w-4" /> Print Receipt
-                  </button>
-              </div>
+
+                <PassengerFormModal 
+                    isOpen={isModalOpen} 
+                    onClose={() => setIsModalOpen(false)} 
+                    onSubmit={handleModalSubmit}
+                />
+
             </div>
-          )}
-        </div>
+        )}
       </div>
     </div>
   );

@@ -196,7 +196,14 @@ export default function Hero() {
         {/* Search Button */}
         <motion.div variants={itemVariants} className="mt-8">
           <Link
-            href="/booking"
+            href={{
+              pathname: '/booking',
+              query: {
+                from: 'Lagos', // In a real app, these would come from state
+                to: 'Abuja',
+                date: new Date().toISOString().split('T')[0]
+              }
+            }}
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-4 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-500 hover:shadow-emerald-600/30 active:scale-95 sm:w-auto sm:px-12"
           >
             Search Availability
