@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { Filter, ChevronLeft, ArrowRight, User } from "lucide-react";
 import BusCard from "./components/BusCard";
 import SeatMap from "./components/SeatMap";
@@ -7,7 +7,7 @@ import BookingSearch from "./components/BookingSearch";
 import PassengerFormModal from "./components/PassengerFormModal";
 import { useSearchParams, useRouter } from 'next/navigation';
 
-export default function Booking() {
+function BookingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -342,5 +342,15 @@ export default function Booking() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function Booking() {
+  return (
+    <Suspense fallback={<div className="flex h-screen items-center justify-center">
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent"></div>
+    </div>}>
+      <BookingContent />
+    </Suspense>
   );
 }
