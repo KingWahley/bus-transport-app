@@ -153,6 +153,7 @@ function BookingContent() {
   });
   const [ticket, setTicket] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // Single seat selection: simplified logic
   const toggleSeat = (seatId) => {
@@ -187,24 +188,29 @@ function BookingContent() {
 
   const handleModalSubmit = (details) => {
       setPassengerDetails(details);
+      setIsProcessing(true);
       
-      // Generate Ticket
-      setTicket({
-          id: Math.random().toString(36).substr(2, 9).toUpperCase(),
-          bus: selectedBus,
-          seats: selectedSeats,
-          passenger: details,
-          date: new Date().toISOString()
-      });
-      setIsModalOpen(false);
-
-      // Scroll to ticket on mobile
+      // Simulate Processing Delay
       setTimeout(() => {
-          const ticketElement = document.getElementById('ticket-view');
-          if (ticketElement) {
-              ticketElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
-      }, 100);
+          // Generate Ticket
+          setTicket({
+              id: Math.random().toString(36).substr(2, 9).toUpperCase(),
+              bus: selectedBus,
+              seats: selectedSeats,
+              passenger: details,
+              date: new Date().toISOString()
+          });
+          setIsProcessing(false);
+          setIsModalOpen(false);
+
+          // Scroll to ticket on mobile
+          setTimeout(() => {
+              const ticketElement = document.getElementById('ticket-view');
+              if (ticketElement) {
+                  ticketElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+          }, 100);
+      }, 2000);
   };
 
   return (
@@ -410,6 +416,7 @@ function BookingContent() {
                     isOpen={isModalOpen} 
                     onClose={() => setIsModalOpen(false)} 
                     onSubmit={handleModalSubmit}
+                    isProcessing={isProcessing}
                 />
 
             </div>

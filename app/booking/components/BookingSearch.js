@@ -13,6 +13,7 @@ export default function BookingSearch({ onSearch, initialValues }) {
   const [passengers, setPassengers] = useState(initialValues.passengers || { adults: 1, children: 0 });
   const [isPassengerOpen, setIsPassengerOpen] = useState(false);
   const [isDateOpen, setIsDateOpen] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const passengerRef = useRef(null);
   const dateRef = useRef(null);
 
@@ -42,7 +43,12 @@ export default function BookingSearch({ onSearch, initialValues }) {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    onSearch({ from, to, date, tripType, passengers });
+    setIsSearching(true);
+    // Simulate short delay for better UX
+    setTimeout(() => {
+        onSearch({ from, to, date, tripType, passengers });
+        setIsSearching(false);
+    }, 600);
   };
 
   const handleSwap = () => {
@@ -187,7 +193,7 @@ export default function BookingSearch({ onSearch, initialValues }) {
                                         type="button"
                                         onClick={() => handlePassengerChange('adults', 'dec')}
                                         disabled={passengers.adults <= 1}
-                                        className="rounded-full bg-slate-100 p-1.5 text-slate-500 hover:bg-emerald-100 hover:text-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-emerald-100 hover:text-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         <Minus className="h-4 w-4" />
                                     </button>
@@ -195,7 +201,7 @@ export default function BookingSearch({ onSearch, initialValues }) {
                                     <button
                                         type="button"
                                         onClick={() => handlePassengerChange('adults', 'inc')}
-                                        className="rounded-full bg-slate-100 p-1.5 text-slate-500 hover:bg-emerald-100 hover:text-emerald-600"
+                                        className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-emerald-100 hover:text-emerald-600"
                                     >
                                         <Plus className="h-4 w-4" />
                                     </button>
@@ -213,7 +219,7 @@ export default function BookingSearch({ onSearch, initialValues }) {
                                         type="button"
                                         onClick={() => handlePassengerChange('children', 'dec')}
                                         disabled={passengers.children <= 0}
-                                        className="rounded-full bg-slate-100 p-1.5 text-slate-500 hover:bg-emerald-100 hover:text-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-emerald-100 hover:text-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         <Minus className="h-4 w-4" />
                                     </button>
@@ -221,7 +227,7 @@ export default function BookingSearch({ onSearch, initialValues }) {
                                     <button
                                         type="button"
                                         onClick={() => handlePassengerChange('children', 'inc')}
-                                        className="rounded-full bg-slate-100 p-1.5 text-slate-500 hover:bg-emerald-100 hover:text-emerald-600"
+                                        className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-emerald-100 hover:text-emerald-600"
                                     >
                                         <Plus className="h-4 w-4" />
                                     </button>
@@ -235,9 +241,17 @@ export default function BookingSearch({ onSearch, initialValues }) {
 
         <button 
             type="submit"
-            className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-4 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-500 hover:shadow-emerald-600/30 active:scale-95 sm:mt-0 sm:w-auto sm:px-8"
+            disabled={isSearching}
+            className={`mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-4 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-500 hover:shadow-emerald-600/30 active:scale-95 sm:mt-0 sm:w-auto sm:px-8 ${isSearching ? 'opacity-75 cursor-wait' : ''}`}
         >
-            Search Bus
+            {isSearching ? (
+                <>
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    <span>Searching...</span>
+                </>
+            ) : (
+                "Search Bus"
+            )}
         </button>
       </form>
     </div>

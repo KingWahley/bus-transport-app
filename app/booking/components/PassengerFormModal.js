@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { X, User, Phone } from 'lucide-react';
 
-export default function PassengerFormModal({ isOpen, onClose, onSubmit }) {
+export default function PassengerFormModal({ isOpen, onClose, onSubmit, isProcessing }) {
   const [formData, setFormData] = useState({ fullName: '', phone: '' });
 
   if (!isOpen) return null;
@@ -13,10 +13,22 @@ export default function PassengerFormModal({ isOpen, onClose, onSubmit }) {
         return;
     }
     onSubmit(formData);
-    // Reset form or keep it? existing requirement says "closes immediately". 
-    // Usually good to keep validation but reset on success if needed.
-    // The parent controls visibility, so we just call onSubmit.
   };
+// ... existing code ...
+             <button 
+                type="submit"
+                disabled={isProcessing}
+                className={`flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-4 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-500 active:scale-95 ${isProcessing ? 'opacity-75 cursor-wait' : ''}`}
+             >
+                {isProcessing ? (
+                  <>
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    <span>Processing...</span>
+                  </>
+                ) : (
+                  "Confirm & Pay"
+                )}
+             </button>
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
@@ -68,9 +80,17 @@ export default function PassengerFormModal({ isOpen, onClose, onSubmit }) {
           <div className="pt-2">
              <button 
                 type="submit"
-                className="w-full rounded-xl bg-emerald-600 py-4 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-500 active:scale-95"
+                disabled={isProcessing}
+                className={`flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-4 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-500 active:scale-95 ${isProcessing ? 'opacity-75 cursor-wait' : ''}`}
              >
-                Confirm & Pay
+                {isProcessing ? (
+                  <>
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    <span>Processing...</span>
+                  </>
+                ) : (
+                  "Confirm & Pay"
+                )}
              </button>
           </div>
         </form>

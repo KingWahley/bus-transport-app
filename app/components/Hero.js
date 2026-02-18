@@ -49,6 +49,7 @@ export default function Hero() {
   });
   
   const [showPassengerMenu, setShowPassengerMenu] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
 
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -307,6 +308,7 @@ export default function Hero() {
         {/* Search Button */}
         <motion.div variants={itemVariants} className="mt-8">
           <Link
+            onClick={() => setIsSearching(true)}
             href={{
               pathname: '/booking',
               query: {
@@ -321,9 +323,16 @@ export default function Hero() {
                 children: searchState.passengers.children
               }
             }}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-4 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-500 hover:shadow-emerald-600/30 active:scale-95 sm:w-auto sm:px-12"
+            className={`flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-4 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-500 hover:shadow-emerald-600/30 active:scale-95 sm:w-auto sm:px-12 ${isSearching ? 'opacity-75 cursor-wait' : ''}`}
           >
-            Search Availability
+            {isSearching ? (
+              <>
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                <span>Searching...</span>
+              </>
+            ) : (
+              "Search Availability"
+            )}
           </Link>
         </motion.div>
       </motion.div>
