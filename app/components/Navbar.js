@@ -25,7 +25,7 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Desktop navigation (NO "Book later")
+  // Desktop navigation (NO "Booking ")
   const navItems = [
     { label: "Home", href: "/", icon: Home },
     { label: "About", href: "/about", icon: LifeBuoy },

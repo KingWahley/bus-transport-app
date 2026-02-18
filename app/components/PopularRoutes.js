@@ -90,31 +90,36 @@ export default function PopularRoutes() {
               key={i}
               variants={itemVariants}
               whileHover={{ scale: 1.03 }}
-              className="flex flex-col rounded-2xl bg-slate-50 border border-slate-200 p-6 transition hover:shadow-lg hover:shadow-slate-200/50 hover:border-emerald-500/20"
+              className="group"
             >
-              <div className="mb-4 flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-500">
-                <span>Direct</span>
-                <span>{route.duration}</span>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex flex-col gap-1">
-                  <span className="text-xl font-bold text-slate-900">
-                    {route.from}
-                  </span>
-                  <span className="h-8 w-px bg-slate-200 ml-2"></span>
-                  <span className="text-xl font-bold text-slate-500">
-                    {route.to}
-                  </span>
+              <Link
+                href={`/booking?from=${route.from}&to=${route.to}`}
+                className="flex flex-col h-full rounded-2xl bg-slate-50 border border-slate-200 p-6 transition hover:shadow-lg hover:shadow-slate-200/50 hover:border-emerald-500/20"
+              >
+                <div className="mb-4 flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-500">
+                  <span>Direct</span>
+                  <span>{route.duration}</span>
                 </div>
 
-                <motion.div
-                  whileHover={{ rotate: -45, scale: 1.1 }}
-                  className="grid h-12 w-12 place-items-center rounded-full border border-dashed border-slate-300 text-slate-400"
-                >
-                  <ArrowRight className="h-5 w-5 -rotate-45" />
-                </motion.div>
-              </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xl font-bold text-slate-900">
+                      {route.from}
+                    </span>
+                    <span className="h-8 w-px bg-slate-200 ml-2"></span>
+                    <span className="text-xl font-bold text-slate-500">
+                      {route.to}
+                    </span>
+                  </div>
+
+                  <motion.div
+                    whileHover={{ rotate: -45, scale: 1.1 }}
+                    className="grid h-12 w-12 place-items-center rounded-full border border-dashed border-slate-300 text-slate-400 group-hover:bg-emerald-50 group-hover:text-emerald-500 group-hover:border-emerald-500"
+                  >
+                    <ArrowRight className="h-5 w-5 -rotate-45" />
+                  </motion.div>
+                </div>
+              </Link>
             </motion.div>
           ))}
         </motion.div>
@@ -137,9 +142,10 @@ export default function PopularRoutes() {
                 }}
               >
                 {[...routes, ...routes].map((route, i) => (
-                  <div
+                  <Link
                     key={i}
-                    className="flex flex-col w-[280px] flex-shrink-0 rounded-2xl bg-slate-50 border border-slate-200 p-6"
+                    href={`/booking?from=${route.from}&to=${route.to}`}
+                    className="flex flex-col w-[280px] flex-shrink-0 rounded-2xl bg-slate-50 border border-slate-200 p-6 hover:shadow-lg transition-shadow"
                   >
                     <div className="mb-4 flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-500">
                       <span>Direct</span>
@@ -161,7 +167,7 @@ export default function PopularRoutes() {
                         <ArrowRight className="h-5 w-5 -rotate-45" />
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </motion.div>
             </div>
@@ -174,9 +180,10 @@ export default function PopularRoutes() {
                 className="grid gap-4 grid-cols-1"
             >
               {routes.map((route, i) => (
-                <div
+                <Link
                   key={i}
-                  className="flex flex-col rounded-2xl bg-slate-50 border border-slate-200 p-6"
+                  href={`/booking?from=${route.from}&to=${route.to}`}
+                  className="flex flex-col rounded-2xl bg-slate-50 border border-slate-200 p-6 hover:shadow-md transition-shadow"
                 >
                   <div className="mb-4 flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-500">
                     <span>Direct</span>
@@ -198,7 +205,7 @@ export default function PopularRoutes() {
                       <ArrowRight className="h-5 w-5 -rotate-45" />
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </motion.div>
           )}

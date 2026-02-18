@@ -359,13 +359,10 @@ function BookingContent() {
                                                 <span className="font-bold text-slate-900">{new Date(ticket.date).toDateString()}</span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-sm text-slate-500">Time</span>
+                                                <span className="text-sm text-slate-500">Depature Time</span>
                                                 <span className="font-bold text-slate-900">{ticket.bus.departureTime}</span>
                                             </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-sm text-slate-500">Bus Operator</span>
-                                                <span className="font-bold text-slate-900">{ticket.bus.operator}</span>
-                                            </div>
+                                            
                                         </div>
                                         
                                         {/* Ticket ID */}

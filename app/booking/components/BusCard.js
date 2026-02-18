@@ -36,7 +36,7 @@ export default function BusCard({ bus, onSelect, selected }) {
         {/* Middle: Bus Info */}
         <div className="flex flex-col gap-1 sm:items-end">
              <h3 className="font-bold text-slate-900 flex items-center gap-2">
-                {bus.operator}
+                
                 <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-700">
                     {bus.type}
                 </span>
