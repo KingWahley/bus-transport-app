@@ -14,6 +14,9 @@ function BookingContent() {
   const fromParam = searchParams.get('from');
   const toParam = searchParams.get('to');
   const dateParam = searchParams.get('date');
+  const tripTypeParam = searchParams.get('tripType');
+  const adultsParam = searchParams.get('adults');
+  const childrenParam = searchParams.get('children');
   
   // If params exist, start at 'bus', otherwise 'search'
   const [step, setStep] = useState(fromParam ? "bus" : "search"); // 'search' | 'bus' | 'seat'
@@ -26,8 +29,11 @@ function BookingContent() {
       from: fromParam || 'Lagos',
       to: toParam || 'Abuja',
       date: dateParam || new Date().toISOString().split('T')[0],
-      tripType: 'domestic',
-      passengers: { adults: 1, children: 0 }
+      tripType: tripTypeParam || 'domestic',
+      passengers: { 
+          adults: parseInt(adultsParam) || 1, 
+          children: parseInt(childrenParam) || 0 
+      }
   });
   
   // Helper to get display values
@@ -165,15 +171,17 @@ function BookingContent() {
         }
         setSelectedSeats(newSeats);
         
-        // Scroll to summary when max seats are selected or just on any selection
-        // User requested "once user clicks on a sit, auto scroll the page to summary"
-        // It's better to scroll only if we have at least one seat
-        setTimeout(() => {
-            const summaryElement = document.getElementById('booking-summary');
-            if (summaryElement ) {
-                 summaryElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }, 100);
+        setSelectedSeats(newSeats);
+        
+        // Scroll to summary ONLY when max required seats are selected
+        if (newSeats.length === maxSeats) {
+            setTimeout(() => {
+                const summaryElement = document.getElementById('booking-summary');
+                if (summaryElement) {
+                     summaryElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 300); // Increased delay slightly for better UX
+        }
     }
   };
 

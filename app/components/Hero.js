@@ -38,6 +38,17 @@ const itemVariants = {
 export default function Hero() {
   const ref = useRef(null);
   const [isMobile, setIsMobile] = useState(false);
+  
+  // Search State
+  const [searchState, setSearchState] = useState({
+    from: "Lagos, Nigeria",
+    to: "Abuja, Nigeria",
+    date: new Date().toISOString().split('T')[0],
+    passengers: { adults: 1, children: 0 },
+    tripType: 'domestic'
+  });
+  
+  const [showPassengerMenu, setShowPassengerMenu] = useState(false);
 
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -57,6 +68,19 @@ export default function Hero() {
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  const domesticCities = [
+    "Lagos, Nigeria", "Abuja, Nigeria", "Port Harcourt, Nigeria", 
+    "Enugu, Nigeria", "Ibadan, Nigeria", "Benin, Nigeria", 
+    "Jos, Nigeria", "Kaduna, Nigeria"
+  ];
+
+  const internationalCities = [
+    "Lagos, Nigeria", "Accra, Ghana", "Cotonou, Benin", 
+    "Lomé, Togo", "Abidjan, Ivory Coast"
+  ];
+
+  const currentCities = searchState.tripType === 'international' ? internationalCities : domesticCities;
 
   return (
     <section ref={ref} className="relative pt-32 pb-20 lg:pt-16 overflow-hidden min-h-[600px] lg:h-[800px] h-auto flex items-center">
@@ -109,10 +133,24 @@ export default function Hero() {
       >
         {/* Tabs */}
         <motion.div variants={itemVariants} className="mb-8 flex gap-4">
-          <button className="rounded-full bg-slate-900 px-6 py-2 text-sm font-bold text-white transition hover:bg-slate-800">
+          <button 
+            onClick={() => setSearchState({ ...searchState, tripType: 'domestic', from: "Lagos, Nigeria", to: "Abuja, Nigeria" })}
+            className={`rounded-full px-6 py-2 text-sm font-bold transition ${
+                searchState.tripType === 'domestic' 
+                ? 'bg-slate-900 text-white hover:bg-slate-800' 
+                : 'bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-900'
+            }`}
+          >
             Local
           </button>
-          <button className="rounded-full bg-slate-100 px-6 py-2 text-sm font-bold text-slate-500 transition hover:bg-slate-200 hover:text-slate-900">
+          <button 
+            onClick={() => setSearchState({ ...searchState, tripType: 'international', from: "Lagos, Nigeria", to: "Accra, Ghana" })}
+            className={`rounded-full px-6 py-2 text-sm font-bold transition ${
+                searchState.tripType === 'international' 
+                ? 'bg-slate-900 text-white hover:bg-slate-800' 
+                : 'bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-900'
+            }`}
+          >
             International
           </button>
         </motion.div>
@@ -144,9 +182,14 @@ export default function Hero() {
             </label>
             <div className="relative">
               <MapPin className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-              <select className="w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-12 pr-4 text-sm font-medium text-slate-900 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all">
-                <option>Lagos, Nigeria</option>
-                <option>Abuja, Nigeria</option>
+              <select 
+                value={searchState.from}
+                onChange={(e) => setSearchState({ ...searchState, from: e.target.value })}
+                className="w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-12 pr-4 text-sm font-medium text-slate-900 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all"
+              >
+                {currentCities.map((city) => (
+                  <option key={city} value={city}>{city}</option>
+                ))}
               </select>
             </div>
           </motion.div>
@@ -158,9 +201,14 @@ export default function Hero() {
             </label>
             <div className="relative">
               <MapPin className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-              <select className="w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-12 pr-4 text-sm font-medium text-slate-900 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all">
-                <option>Abuja, Nigeria</option>
-                <option>Port Harcourt, Nigeria</option>
+              <select 
+                value={searchState.to}
+                onChange={(e) => setSearchState({ ...searchState, to: e.target.value })}
+                className="w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-12 pr-4 text-sm font-medium text-slate-900 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all"
+              >
+                {currentCities.map((city) => (
+                  <option key={city} value={city}>{city}</option>
+                ))}
               </select>
             </div>
           </motion.div>
@@ -174,21 +222,84 @@ export default function Hero() {
               <Clock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
               <input
                 type="date"
+                value={searchState.date}
+                onChange={(e) => setSearchState({ ...searchState, date: e.target.value })}
+                min={new Date().toISOString().split('T')[0]}
                 className="w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-12 pr-4 text-sm font-medium text-slate-900 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all"
               />
             </div>
           </motion.div>
 
           {/* Passengers */}
-          <motion.div variants={itemVariants} className="space-y-2">
+          <motion.div variants={itemVariants} className="space-y-2 relative">
             <label className="text-xs font-bold uppercase tracking-wider text-slate-500">
               Passengers
             </label>
             <div className="relative">
-              <div className="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50 py-3.5 px-4 text-sm font-medium text-slate-900 hover:border-slate-300 transition-colors cursor-pointer">
-                <span>1 Adult</span>
-                <ArrowRight className="h-4 w-4 text-slate-500" />
-              </div>
+              <button
+                onClick={() => setShowPassengerMenu(!showPassengerMenu)}
+                className="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50 py-3.5 px-4 text-sm font-medium text-slate-900 hover:border-slate-300 transition-colors"
+              >
+                <span>
+                    {searchState.passengers.adults} Adult{searchState.passengers.adults > 1 ? 's' : ''}
+                    {searchState.passengers.children > 0 && `, ${searchState.passengers.children} Child${searchState.passengers.children > 1 ? 'ren' : ''}`}
+                </span>
+                <ArrowRight className={`h-4 w-4 text-slate-500 transition-transform ${showPassengerMenu ? 'rotate-90' : ''}`} />
+              </button>
+              
+              {showPassengerMenu && (
+                  <div className="absolute top-full left-0 mt-2 w-full min-w-[240px] rounded-xl border border-slate-200 bg-white p-4 shadow-xl z-20">
+                      {/* Adults */}
+                      <div className="flex items-center justify-between mb-4">
+                          <div>
+                              <p className="font-bold text-slate-900">Adults</p>
+                              <p className="text-xs text-slate-500">Age 13+</p>
+                          </div>
+                          <div className="flex items-center gap-3">
+                              <button 
+                                onClick={() => setSearchState(prev => ({ 
+                                    ...prev, 
+                                    passengers: { ...prev.passengers, adults: Math.max(1, prev.passengers.adults - 1) } 
+                                }))}
+                                className="h-8 w-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50"
+                              >-</button>
+                              <span className="font-bold w-4 text-center">{searchState.passengers.adults}</span>
+                              <button 
+                                onClick={() => setSearchState(prev => ({ 
+                                    ...prev, 
+                                    passengers: { ...prev.passengers, adults: Math.min(10, prev.passengers.adults + 1) } 
+                                }))}
+                                className="h-8 w-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50"
+                              >+</button>
+                          </div>
+                      </div>
+                      
+                      {/* Children */}
+                      <div className="flex items-center justify-between">
+                          <div>
+                              <p className="font-bold text-slate-900">Children</p>
+                              <p className="text-xs text-slate-500">Age 2-12</p>
+                          </div>
+                          <div className="flex items-center gap-3">
+                              <button 
+                                onClick={() => setSearchState(prev => ({ 
+                                    ...prev, 
+                                    passengers: { ...prev.passengers, children: Math.max(0, prev.passengers.children - 1) } 
+                                }))}
+                                className="h-8 w-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50"
+                              >-</button>
+                              <span className="font-bold w-4 text-center">{searchState.passengers.children}</span>
+                              <button 
+                                onClick={() => setSearchState(prev => ({ 
+                                    ...prev, 
+                                    passengers: { ...prev.passengers, children: Math.min(10, prev.passengers.children + 1) } 
+                                }))}
+                                className="h-8 w-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50"
+                              >+</button>
+                          </div>
+                      </div>
+                  </div>
+              )}
             </div>
           </motion.div>
         </motion.div>
@@ -199,9 +310,15 @@ export default function Hero() {
             href={{
               pathname: '/booking',
               query: {
-                from: 'Lagos', // In a real app, these would come from state
-                to: 'Abuja',
-                date: new Date().toISOString().split('T')[0]
+                from: searchState.from,
+                to: searchState.to,
+                date: searchState.date,
+                from: searchState.from,
+                to: searchState.to,
+                date: searchState.date,
+                tripType: searchState.tripType,
+                adults: searchState.passengers.adults,
+                children: searchState.passengers.children
               }
             }}
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-4 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-500 hover:shadow-emerald-600/30 active:scale-95 sm:w-auto sm:px-12"
