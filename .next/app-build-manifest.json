@@ -1,46 +1,25 @@
 {
   "pages": {
-    "/_not-found": [
-      "static/chunks/webpack-1030d0803ec0d34a.js",
-      "static/chunks/fd9d1056-e277d5d4f028f8ef.js",
-      "static/chunks/69-f3f26a352e1f41d3.js",
-      "static/chunks/main-app-d0a13897203ae29a.js",
-      "static/chunks/app/_not-found-1674e4b876a10fdd.js"
+    "/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/page.js"
     ],
     "/layout": [
-      "static/chunks/webpack-1030d0803ec0d34a.js",
-      "static/chunks/fd9d1056-e277d5d4f028f8ef.js",
-      "static/chunks/69-f3f26a352e1f41d3.js",
-      "static/chunks/main-app-d0a13897203ae29a.js",
-      "static/chunks/c15bf2b0-d655bd5d551e8c35.js",
-      "static/chunks/951-4b4d9e94c216a670.js",
-      "static/chunks/395-73b47a2fb64ab0a0.js",
-      "static/css/170bbb0d0ccb3044.css",
-      "static/chunks/app/layout-b8536149d8a80e7f.js"
-    ],
-    "/page": [
-      "static/chunks/webpack-1030d0803ec0d34a.js",
-      "static/chunks/fd9d1056-e277d5d4f028f8ef.js",
-      "static/chunks/69-f3f26a352e1f41d3.js",
-      "static/chunks/main-app-d0a13897203ae29a.js",
-      "static/chunks/951-4b4d9e94c216a670.js",
-      "static/chunks/405-008059a8806d687b.js",
-      "static/chunks/app/page-19f2344805b611d2.js"
-    ],
-    "/about/page": [
-      "static/chunks/webpack-1030d0803ec0d34a.js",
-      "static/chunks/fd9d1056-e277d5d4f028f8ef.js",
-      "static/chunks/69-f3f26a352e1f41d3.js",
-      "static/chunks/main-app-d0a13897203ae29a.js",
-      "static/chunks/749-cc50f29e6f2da794.js",
-      "static/chunks/app/about/page-0fb36718291d38e6.js"
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/layout.css",
+      "static/chunks/app/layout.js"
     ],
     "/booking/page": [
-      "static/chunks/webpack-1030d0803ec0d34a.js",
-      "static/chunks/fd9d1056-e277d5d4f028f8ef.js",
-      "static/chunks/69-f3f26a352e1f41d3.js",
-      "static/chunks/main-app-d0a13897203ae29a.js",
-      "static/chunks/app/booking/page-9412ea69217795b2.js"
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/booking/page.js"
+    ],
+    "/about/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/about/page.js"
     ]
   }
 }

@@ -2,6 +2,7 @@
 
 import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { gsap } from 'gsap';
 
 export const StaggeredMenu = ({
@@ -24,6 +25,7 @@ export const StaggeredMenu = ({
   onMenuOpen,
   onMenuClose
 }) => {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const openRef = useRef(false);
 
@@ -458,7 +460,9 @@ export const StaggeredMenu = ({
                 items.map((it, idx) => (
                   <li className="sm-panel-itemWrap relative overflow-hidden leading-none" key={it.label + idx}>
                     <Link
-                      className="sm-panel-item relative text-black font-semibold text-[4rem] cursor-pointer leading-none tracking-[-2px] uppercase transition-[background,color] duration-150 ease-linear inline-block no-underline pr-[1.4em]"
+                      className={`sm-panel-item relative font-semibold text-[4rem] cursor-pointer leading-none tracking-[-2px] uppercase transition-[background,color] duration-150 ease-linear inline-block no-underline pr-[1.4em] ${
+                        pathname === it.link ? 'text-[var(--sm-accent,#10b981)]' : 'text-black'
+                      }`}
                       href={it.link}
                       aria-label={it.ariaLabel}
                       data-index={idx + 1}

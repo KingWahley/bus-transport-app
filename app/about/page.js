@@ -39,8 +39,8 @@ export default function AboutPage() {
             </div>
 
             {/* "Our Philosophy" Card */}
-            <div className="w-full md:w-1/3 flex flex-col gap-6">
-               <div className="relative aspect-square rounded-[2rem] overflow-hidden shadow-lg">
+            <div className="w-full md:w-1/3 hidden sm:block flex flex-col gap-6">
+               <div className="relative aspect-square  rounded-[2rem] overflow-hidden shadow-lg">
                 <img
                     src="https://executivecoach.net/wp-content/uploads/2024/03/about_us_image1-1.jpg.webp"
                     alt="Detail shot"

@@ -1,10 +1,11 @@
 import "./globals.css";
+import "react-day-picker/dist/style.css";
 import { Space_Grotesk, Manrope, Dancing_Script } from "next/font/google";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
 export const metadata = {
-  title: "Bus Transport System",
+  title: "TG-Motors",
   description: "Book seats, track journeys, and travel in premium comfort.",
 };
 

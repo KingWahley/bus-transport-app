@@ -76,12 +76,7 @@ export default function PopularRoutes() {
             </button>
 
             {/* Desktop: Navigation Link */}
-            <Link
-              href="/booking"
-              className="hidden text-sm font-bold text-emerald-600 hover:text-emerald-500 transition sm:block"
-            >
-              View all destinations →
-            </Link>
+            
           </div>
         </motion.div>
 

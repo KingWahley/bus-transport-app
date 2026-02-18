@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Armchair, SteeringWheel } from "lucide-react";
 
-export default function SeatMap({ selectedSeats, onSeatToggle, price }) {
+export default function SeatMap({ selectedSeats, onSeatToggle, price, maxSeats = 1 }) {
   // Rows: 5, Cols: 5 (3-2 layout) = 25 seats
   const rows = 5;
   
@@ -14,11 +14,11 @@ export default function SeatMap({ selectedSeats, onSeatToggle, price }) {
   };
 
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div id="seat-map-container" className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
       <div className="mb-6 flex items-center justify-between">
         <h3 className="text-lg font-bold text-slate-900">Choose Seats</h3>
-        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">
-          {selectedSeats.length} Selected
+        <span className={`rounded-full px-3 py-1 text-xs font-bold transition-colors ${selectedSeats.length === maxSeats ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
+          {selectedSeats.length}/{maxSeats} Selected
         </span>
       </div>
 
@@ -115,7 +115,7 @@ export default function SeatMap({ selectedSeats, onSeatToggle, price }) {
       </div>
       
       {/* Selection Summary */}
-      <div className="mt-8 border-t border-slate-100 pt-6">
+      <div className="mt-8 border-t border-emerald-600 pt-6">
         <div className="flex items-center justify-between text-sm">
              <span className="text-slate-500">Seat Price</span>
              <span className="font-bold text-slate-900">₦{price.toLocaleString()}</span>

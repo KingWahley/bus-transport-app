@@ -25,29 +25,42 @@ function BookingContent() {
   const [searchDetails, setSearchDetails] = useState({
       from: fromParam || 'Lagos',
       to: toParam || 'Abuja',
-      date: dateParam || new Date().toISOString().split('T')[0]
+      date: dateParam || new Date().toISOString().split('T')[0],
+      tripType: 'domestic',
+      passengers: { adults: 1, children: 0 }
   });
   
   // Helper to get display values
-  const { from, to, date } = searchDetails;
+  const { from, to, date, tripType, passengers } = searchDetails;
 
   const handleSearch = (details) => {
       setSearchDetails(details);
       setStep('bus');
+      setSelectedBus(null); // Reset selection
+      setSelectedSeats([]);
       // Optionally update URL without reload
       const params = new URLSearchParams();
       params.set('from', details.from);
       params.set('to', details.to);
       params.set('date', details.date);
       router.push(`/booking?${params.toString()}`, { scroll: false });
+
+      // Scroll to bus list on mobile
+      setTimeout(() => {
+          const busListElement = document.getElementById('bus-list');
+          if (busListElement && window.innerWidth < 1024) {
+              busListElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+      }, 100);
   };
 
   // Mock Data
-  const buses = [
+  const allBuses = [
     {
       id: 1,
       operator: "Emerald Express",
       type: "Luxury",
+      category: "domestic",
       from: from,
       to: to,
       departureTime: "07:00 AM",
@@ -62,6 +75,7 @@ function BookingContent() {
       id: 2,
       operator: "Orix Transport",
       type: "Standard",
+      category: "domestic",
       from: from,
       to: to,
       departureTime: "08:15 AM",
@@ -76,6 +90,7 @@ function BookingContent() {
        id: 3,
        operator: "Emerald Executive",
        type: "VIP",
+       category: "domestic",
        from: from,
        to: to,
        departureTime: "09:00 AM",
@@ -85,8 +100,25 @@ function BookingContent() {
        rating: 5.0,
        amenities: ["AC", "Wifi", "Power", "Meal"],
        seatsAvailable: 8
-    }
+    },
+    {
+        id: 4,
+        operator: "Emerald International",
+        type: "Luxury",
+        category: "international",
+        from: from,
+        to: to, // Ensure international bus also matches search
+        departureTime: "06:00 AM",
+        arrivalTime: "02:00 PM",
+        duration: "8h 00m",
+        price: 45000,
+        rating: 4.9,
+        amenities: ["AC", "Wifi", "Power", "Meal", "Legroom"],
+        seatsAvailable: 20
+     }
   ];
+
+  const buses = allBuses.filter(bus => bus.category === tripType);
 
   const handleBusSelect = (bus) => {
     setSelectedBus(bus);
@@ -102,6 +134,8 @@ function BookingContent() {
   const handleBack = () => {
       if (step === 'seat') {
           setStep('bus');
+      } else if (step === 'bus') {
+          setStep('search');
       } else {
           router.back();
       }
@@ -116,10 +150,30 @@ function BookingContent() {
 
   // Single seat selection: simplified logic
   const toggleSeat = (seatId) => {
+    const maxSeats = passengers ? (passengers.adults + passengers.children) : 1;
+    
     if (selectedSeats.includes(seatId)) {
-        setSelectedSeats([]);
+        setSelectedSeats(selectedSeats.filter(id => id !== seatId));
     } else {
-        setSelectedSeats([seatId]);
+        let newSeats;
+        if (selectedSeats.length < maxSeats) {
+            newSeats = [...selectedSeats, seatId];
+        } else {
+            // Option: Replace the first selected seat (FIFO) to keep selection fluid
+            // Or just alert. Let's do FIFO for smoother UX
+             newSeats = [...selectedSeats.slice(1), seatId];
+        }
+        setSelectedSeats(newSeats);
+        
+        // Scroll to summary when max seats are selected or just on any selection
+        // User requested "once user clicks on a sit, auto scroll the page to summary"
+        // It's better to scroll only if we have at least one seat
+        setTimeout(() => {
+            const summaryElement = document.getElementById('booking-summary');
+            if (summaryElement ) {
+                 summaryElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 100);
     }
   };
 
@@ -135,6 +189,14 @@ function BookingContent() {
           date: new Date().toISOString()
       });
       setIsModalOpen(false);
+
+      // Scroll to ticket on mobile
+      setTimeout(() => {
+          const ticketElement = document.getElementById('ticket-view');
+          if (ticketElement) {
+              ticketElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+      }, 100);
   };
 
   return (
@@ -154,11 +216,11 @@ function BookingContent() {
             )}
             <div>
                  <h1 className="text-xl font-bold text-slate-900 sm:text-2xl">
-                    {step === 'search' ? 'Plan Your Trip' : step === 'bus' ? 'Select Bus' : 'Choose Seats'}
+                    {step === 'search' ? '' : step === 'bus' ? 'Select Bus' : 'Choose Seats'}
                  </h1>
                  {step !== 'search' && (
                     <p className="text-sm text-slate-500">
-                        {from} <span className="mx-1 text-emerald-500">→</span> {to} • {new Date(date).toDateString()}
+                        {from} <span className="mx-1 text-emerald-500">→</span> {to} • {new Date(date).toDateString()} • <span className="capitalize">{tripType}</span>
                     </p>
                  )}
             </div>
@@ -177,7 +239,7 @@ function BookingContent() {
         {step === 'search' && (
             <div className="mx-auto max-w-lg lg:max-w-2xl">
                 <BookingSearch 
-                    initialValues={{ from, to, date }}
+                    initialValues={searchDetails}
                     onSearch={handleSearch}
                 />
             </div>
@@ -188,7 +250,7 @@ function BookingContent() {
             <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
             
                 {/* Left Panel: Bus List */}
-                <div className={`
+                <div id="bus-list" className={`
                         flex-1 space-y-4 transition-all duration-300
                         ${step === 'seat' ? 'hidden lg:block lg:w-1/3 lg:opacity-50 lg:pointer-events-none' : 'w-full'}
                 `}>
@@ -223,25 +285,32 @@ function BookingContent() {
                         ${step === 'bus' ? 'hidden lg:block' : 'block'}
                 `}>
                     {selectedBus ? (
-                        <div className="sticky top-28 space-y-6">
+                        <div className="sticky top-28 space-y-2">
                             {!ticket ? (
                                 <>
                                     <SeatMap 
                                         selectedSeats={selectedSeats}
                                         onSeatToggle={toggleSeat}
                                         price={selectedBus.price}
+                                        maxSeats={passengers.adults + passengers.children}
                                     />
                                     
                             {selectedSeats.length > 0 && (
-                                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/50">
+                                <div id="booking-summary" className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/50">
                                     <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-4">
                                         <span className="text-sm font-bold text-slate-500">Summary</span>
                                         <User className="h-4 w-4 text-slate-400" />
                                     </div>
                                     
-                                    <div className="mb-6 flex items-center justify-between">
-                                         <span className="text-slate-500">Selected Seat</span>
-                                         <span className="font-bold text-emerald-600 text-lg">{selectedSeats[0]}</span>
+                                    <div className="mb-6 space-y-2">
+                                         <div className="flex items-center justify-between">
+                                            <span className="text-slate-500">Selected Seats</span>
+                                            <span className="font-bold text-emerald-600 text-lg">{selectedSeats.join(', ')}</span>
+                                         </div>
+                                         <div className="flex items-center justify-between text-xs text-slate-400">
+                                            <span>Passengers</span>
+                                            <span>{passengers.adults} Adult, {passengers.children} Child</span>
+                                         </div>
                                     </div>
                                     
                                     <button 
@@ -254,7 +323,7 @@ function BookingContent() {
                             )}
                                 </>
                             ) : (
-                                <div className="overflow-hidden rounded-3xl bg-white text-slate-900 border border-slate-200 shadow-xl shadow-slate-200/50">
+                                <div id="ticket-view" className="overflow-hidden rounded-3xl bg-white text-slate-900 border border-slate-200 shadow-xl shadow-slate-200/50">
                                     <div className="bg-emerald-500 p-6 text-center text-white">
                                         <div className="mb-2 flex justify-center">
                                             <div className="rounded-full bg-white/20 p-3">
@@ -262,7 +331,7 @@ function BookingContent() {
                                             </div>
                                         </div>
                                         <h3 className="text-xl font-bold">Booking Confirmed!</h3>
-                                        <p className="text-emerald-100 text-sm">Your ticket has been generated</p>
+                                        <p className="text-emerald-100 text-sm">Here is your ticket</p>
                                     </div>
                                     
                                     <div className="p-6 space-y-6">
@@ -274,8 +343,8 @@ function BookingContent() {
                                                  <p className="text-xs text-slate-500">{ticket.passenger.phone}</p>
                                              </div>
                                              <div className="text-right">
-                                                 <p className="text-xs font-bold uppercase text-slate-400">Seat No</p>
-                                                 <p className="text-2xl font-bold text-emerald-600">{ticket.seats[0]}</p>
+                                                 <p className="text-xs font-bold uppercase text-slate-400">Seats</p>
+                                                 <p className="text-2xl font-bold text-emerald-600">{ticket.seats.join(', ')}</p>
                                              </div>
                                         </div>
 
