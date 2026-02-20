@@ -15,3 +15,38 @@ h5,
 h6 {
   font-family: var(--font-heading), sans-serif;
 }
+
+:root {
+  --scrollbar-track: #dfe2e5;
+  --scrollbar-thumb: #9e9e9e;
+  --scrollbar-thumb-hover: #059669;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 9999px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    var(--scrollbar-thumb) 0%,
+    var(--scrollbar-thumb-hover) 100%
+  );
+  border-radius: 9999px;
+  border: 2px solid var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
